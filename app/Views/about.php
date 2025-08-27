@@ -34,7 +34,6 @@
       </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="container mt-4">
       <div class="container">
           <div class="row justify-content-center">
