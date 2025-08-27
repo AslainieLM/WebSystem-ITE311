@@ -10,72 +10,39 @@ class CreateUsersTable extends Migration
     {
         $this->forge->addField([
             'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'unsigned'       => true,
-                'auto_increment' => true,
+                'type' => 'INT',
+                'constraint' => 5,
+                'unsigned' => true,
+                'auto_increment' => true
             ],
-            'username' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
+            'name' => [
+                'type' => 'VARCHAR',
+                'constraint' => '100',
             ],
             'email' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
+                'type' => 'VARCHAR',
+                'constraint' => '100',
+                'unique' => true,
             ],
             'password' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-            ],
-            'first_name' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
-            ],
-            'last_name' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
+                'type' => 'VARCHAR',
+                'constraint' => '255',
             ],
             'role' => [
-                'type'       => 'ENUM',
-                'constraint' => ['student', 'instructor', 'admin'],
-                'default'    => 'student',
-            ],
-            'profile_picture' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-                'null'       => true,
-            ],
-            'phone' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'null'       => true,
-            ],
-            'date_of_birth' => [
-                'type' => 'DATE',
-                'null' => true,
-            ],
-            'is_active' => [
-                'type'       => 'TINYINT',
-                'constraint' => 1,
-                'default'    => 1,
-            ],
-            'email_verified_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
+                'type' => 'ENUM',
+                'constraint' => ['admin', 'user'],
+                'default' => 'user',
             ],
             'created_at' => [
-                'type' => 'TIMESTAMP',
+                'type' => 'DATETIME',
                 'null' => true,
             ],
             'updated_at' => [
-                'type' => 'TIMESTAMP',
+                'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);
-
-        $this->forge->addKey('id', true);
-        $this->forge->addKey('email');
-        $this->forge->addKey('username');
+        $this->forge->addPrimaryKey('id');
         $this->forge->createTable('users');
     }
 
