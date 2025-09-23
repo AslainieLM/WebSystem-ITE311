@@ -17,3 +17,6 @@ $routes->post('/login', 'Auth::login');
 $routes->get('/logout', 'Auth::logout');
 $routes->get('/dashboard', 'Auth::dashboard');
 
+$routes->get(from: '/admin/dashboard', to: 'Admin::dashboard');
+$routes->get(from: '/teacher/dashboard', to: 'Teacher::dashboard');
+$routes->get(from: '/student/dashboard', to: 'Student::dashboard');

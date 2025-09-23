@@ -11,38 +11,46 @@ class UserSeeder extends Seeder
         // Users data
         $users = [
             [
-                'username'    => 'aslainie_lm',
+                'name'    => 'aslainie_lm',
                 'email'       => 'aslainie@gmail.com',
                 'password'    => password_hash('aslainie', PASSWORD_DEFAULT),
-                'first_name'  => 'Aslainie',
-                'last_name'   => 'Maruhom',
                 'role'        => 'admin',
-                'is_active'   => 1,
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'username'    => 'amarah_tador',
+                'name'    => 'norami_marohombsar',
+                'email'       => 'norami@gmail.com',
+                'password'    => password_hash('norami', PASSWORD_DEFAULT),
+                'role'        => 'teacher',
+                'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => date('Y-m-d H:i:s'),
+            ],
+            [
+                'name'    => 'baikan_lampac',
+                'email'       => 'baikan@gmail.com',
+                'password'    => password_hash('baikan', PASSWORD_DEFAULT),
+                'role'        => 'student',
+                'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => date('Y-m-d H:i:s'),
+            ],
+            [
+                'name'    => 'amarah_tador',
                 'email'       => 'amarah@gmail.com',
                 'password'    => password_hash('amarah', PASSWORD_DEFAULT),
-                'first_name'  => 'Amarah',
-                'last_name'   => 'Tador',
-                'role'        => 'instructor',
-                'is_active'   => 1,
+                'role'        => 'teacher',
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'username'    => 'anisah_lampac',
+                'name'    => 'anisah_lampac',
                 'email'       => 'anisah@gmail.com',
                 'password'    => password_hash('anisah', PASSWORD_DEFAULT),
-                'first_name'  => 'Anisah',
-                'last_name'   => 'Lampac',
                 'role'        => 'student',
-                'is_active'   => 1,
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
+
         ];
 
         $this->db->table('users')->insertBatch($users);
