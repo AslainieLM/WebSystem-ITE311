@@ -22,7 +22,6 @@ class Auth extends BaseController
         }
 
         if ($this->request->getMethod() === 'POST') {
-            
             $rules = [
                 'name'             => 'required|min_length[3]|max_length[100]',
                 'email'            => 'required|valid_email|is_unique[users.email]',
@@ -52,14 +51,13 @@ class Auth extends BaseController
             ];
 
             if ($this->validate($rules, $messages)) {
-                
                 $hashedPassword = password_hash($this->request->getPost('password'), PASSWORD_DEFAULT);
-
+                
                 $userData = [
                     'name'       => $this->request->getPost('name'),
                     'email'      => $this->request->getPost('email'),
                     'password'   => $hashedPassword,
-                    'role'       => 'user',
+                    'role'       => 'student',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
@@ -83,11 +81,10 @@ class Auth extends BaseController
     public function login()
     {
         if ($this->isLoggedIn()) {
-            return redirect()->to(base_url('dashboard'));
+            return $this->redirectByRole();
         }
 
         if ($this->request->getMethod() === 'POST') {
-            
             $rules = [
                 'email'    => 'required|valid_email',
                 'password' => 'required'
@@ -108,12 +105,9 @@ class Auth extends BaseController
                 $password = $this->request->getPost('password');
 
                 $builder = $this->db->table('users');
-                $user = $builder->where('email', $email)
-                               ->get()
-                               ->getRowArray();
+                $user = $builder->where('email', $email)->get()->getRowArray();
 
                 if ($user && password_verify($password, $user['password'])) {
-                    
                     $sessionData = [
                         'userID'     => $user['id'],
                         'name'       => $user['name'],
@@ -123,10 +117,8 @@ class Auth extends BaseController
                     ];
 
                     $this->session->set($sessionData);
-                    
                     $this->session->setFlashdata('success', 'Welcome back, ' . $user['name'] . '!');
-                    return redirect()->to(base_url('dashboard'));
-                    
+                    return $this->redirectByRole();
                 } else {
                     $this->session->setFlashdata('error', 'Invalid email or password.');
                 }
@@ -138,10 +130,25 @@ class Auth extends BaseController
         return view('auth/login');
     }
 
+    private function redirectByRole()
+    {
+        $role = $this->session->get('role');
+        
+        switch ($role) {
+            case 'admin':
+                return redirect()->to(base_url('admin/dashboard'));
+            case 'teacher':
+                return redirect()->to(base_url('teacher/dashboard'));
+            case 'student':
+                return redirect()->to(base_url('student/dashboard'));
+            default:
+                return redirect()->to(base_url('dashboard'));
+        }
+    }
+
     public function logout()
     {
         $this->session->destroy();
-        
         $this->session->setFlashdata('success', 'You have been logged out successfully.');
         return redirect()->to(base_url('login'));
     }
@@ -153,19 +160,7 @@ class Auth extends BaseController
             return redirect()->to(base_url('login'));
         }
 
-        $userData = [
-            'userID' => $this->session->get('userID'),
-            'name'   => $this->session->get('name'),
-            'email'  => $this->session->get('email'),
-            'role'   => $this->session->get('role')
-        ];
-        
-        $data = [
-            'user' => $userData,
-            'title' => 'Dashboard - MGOD LMS'
-        ];
-
-        return view('auth/dashboard', $data);
+        return $this->redirectByRole();
     }
 
     private function isLoggedIn(): bool
