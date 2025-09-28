@@ -1,7 +1,6 @@
 <?= view('templates/header', ['title' => $title ?? 'Dashboard - MARUHOM LMS']) ?>
 
 <div class="container-fluid py-4">
-    <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -46,10 +45,8 @@
         </div>
     </div>
 
-    <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <?php if ($user['role'] === 'admin'): ?>
-            <!-- Admin Statistics -->
             <div class="col-lg-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -111,7 +108,6 @@
                 </div>
             </div>
         <?php elseif ($user['role'] === 'teacher'): ?>
-            <!-- Teacher Statistics -->
             <div class="col-lg-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -173,7 +169,6 @@
                 </div>
             </div>
         <?php else: ?>
-            <!-- Student Statistics -->
             <div class="col-lg-3 col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -237,10 +232,8 @@
         <?php endif; ?>
     </div>
 
-    <!-- Main Content Row -->
     <div class="row g-4">
         <?php if ($user['role'] === 'admin'): ?>
-            <!-- Admin Dashboard Content -->
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-0 pb-0">
@@ -322,7 +315,6 @@
                 </div>
             </div>
         <?php elseif ($user['role'] === 'teacher'): ?>
-            <!-- Teacher Dashboard Content -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-0 pb-0">
@@ -373,7 +365,6 @@
                 </div>
             </div>
         <?php else: ?>
-            <!-- Student Dashboard Content -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-0 pb-0">
@@ -402,7 +393,6 @@
     </div>
 
     <?php if ($user['role'] === 'admin'): ?>
-        <!-- System Overview Section for Admin -->
         <div class="row g-4 mt-2">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
