@@ -1,129 +1,470 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" 
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
-    crossorigin="anonymous">
-    
-    <title><?= isset($title) ? $title : 'Dashboard - Maruhom LMS' ?></title>
-</head>
-<body class="bg-light">
-    
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="<?= base_url('dashboard') ?>">
-            <strong>Maruhom LMS</strong>
-        </a>
-        
-        <div class="navbar-nav ml-auto">
-            <span class="navbar-text text-white mr-3">
-                Welcome, <?= isset($user) ? htmlspecialchars($user['name']) : 'Student' ?>
-            </span>
-            <a class="nav-link text-white" href="<?= base_url('/') ?>">Homepage</a>
-            <a class="nav-link text-white" href="<?= base_url('logout') ?>" 
-               onclick="return confirm('Are you sure you want to logout?')">
-                Logout
-            </a>
-        </div>
-    </nav>
+<?= view('templates/header', ['title' => $title ?? 'Dashboard - MARUHOM LMS']) ?>
 
-    <div class="container-fluid mt-4">
-        
-        <?php if (session()->getFlashdata('success')): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= session()->getFlashdata('success') ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        <?php endif; ?>
-        
-        <?php if (session()->getFlashdata('error')): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= session()->getFlashdata('error') ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        <?php endif; ?>
-
-        <div class="row">
-            <div class="col-md-12 mb-4">
-                <h2 class="text-center text-primary">
-                    <strong>Maruhom Learning Management System</strong>
-                </h2>
-                <p class="text-center text-muted">Your Gateway to Online Learning</p>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- My Courses Card -->
-            <div class="col-md-12 mb-4">
-                <div class="card">
-                    <div class="card-header bg-success text-white text-center">
-                        <h5 class="mb-0">My Courses</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group list-group-flush">
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                Web Development
-                                <span class="badge badge-primary badge-pill">75%</span>
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <?php if ($user['role'] === 'admin'): ?>
+                    <div class="card-body bg-primary text-white rounded">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-light text-primary rounded-circle p-3 fs-4">👨‍💼</span>
                             </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                Database Design
-                                <span class="badge badge-warning badge-pill">45%</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                PHP Programming
-                                <span class="badge badge-info badge-pill">90%</span>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="#" class="btn btn-success btn-sm">View All Courses</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="row">
-            <div class="col-md-12 mb-4">
-                <div class="card">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0">Recent Activity</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group list-group-flush">
-                            <div class="list-group-item border-0 px-0">
-                                <small class="text-muted">Today, 2:30 PM</small>
-                                <p class="mb-1">Completed "PHP Basics" lesson</p>
-                            </div>
-                            <div class="list-group-item border-0 px-0">
-                                <small class="text-muted">Yesterday, 4:15 PM</small>
-                                <p class="mb-1">Submitted Assignment #3</p>
-                            </div>
-                            <div class="list-group-item border-0 px-0">
-                                <small class="text-muted">2 days ago</small>
-                                <p class="mb-1">Started "Database Design" course</p>
+                            <div>
+                                <h2 class="fw-bold mb-1">Welcome, <?= esc($user['name']) ?>!</h2>
+                                <p class="mb-0 opacity-75">Admin Dashboard - Manage your learning management system</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                <?php elseif ($user['role'] === 'teacher'): ?>
+                    <div class="card-body bg-success text-white rounded">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-light text-success rounded-circle p-3 fs-4">👨‍🏫</span>
+                            </div>
+                            <div>
+                                <h2 class="fw-bold mb-1">Welcome, <?= esc($user['name']) ?>!</h2>
+                                <p class="mb-0 opacity-75">Teacher Dashboard - Manage your courses and students</p>
+                            </div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="card-body bg-info text-white rounded">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-light text-info rounded-circle p-3 fs-4">👨‍🎓</span>
+                            </div>
+                            <div>
+                                <h2 class="fw-bold mb-1">Welcome, <?= esc($user['name']) ?>!</h2>
+                                <p class="mb-0 opacity-75">Student Dashboard - Continue your learning journey</p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
-    crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" 
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" 
-    crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" 
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" 
-    crossorigin="anonymous"></script>
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <?php if ($user['role'] === 'admin'): ?>
+            <!-- Admin Statistics -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-primary rounded-circle p-3 fs-4">👥</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-primary mb-1"><?= number_format($totalUsers) ?></h5>
+                                <p class="text-muted mb-0 small">Total Users</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-success rounded-circle p-3 fs-4">👨‍🏫</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-success mb-1"><?= number_format($totalTeachers) ?></h5>
+                                <p class="text-muted mb-0 small">Total Teachers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-info rounded-circle p-3 fs-4">👨‍🎓</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-info mb-1"><?= number_format($totalStudents) ?></h5>
+                                <p class="text-muted mb-0 small">Total Students</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-warning rounded-circle p-3 fs-4">📚</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-warning mb-1">0</h5>
+                                <p class="text-muted mb-0 small">Total Courses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($user['role'] === 'teacher'): ?>
+            <!-- Teacher Statistics -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-primary rounded-circle p-3 fs-4">📚</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-primary mb-1"><?= number_format($totalCourses) ?></h5>
+                                <p class="text-muted mb-0 small">My Courses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-success rounded-circle p-3 fs-4">👨‍🎓</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-success mb-1"><?= number_format($totalStudents) ?></h5>
+                                <p class="text-muted mb-0 small">Total Students</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-warning rounded-circle p-3 fs-4">📝</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-warning mb-1">0</h5>
+                                <p class="text-muted mb-0 small">Pending Reviews</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-info rounded-circle p-3 fs-4">📋</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-info mb-1">0</h5>
+                                <p class="text-muted mb-0 small">Active Assignments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <!-- Student Statistics -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-primary rounded-circle p-3 fs-4">📚</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-primary mb-1"><?= number_format($enrolledCourses) ?></h5>
+                                <p class="text-muted mb-0 small">Enrolled Courses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-success rounded-circle p-3 fs-4">✅</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-success mb-1"><?= number_format($completedAssignments) ?></h5>
+                                <p class="text-muted mb-0 small">Completed Assignments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-warning rounded-circle p-3 fs-4">⏰</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-warning mb-1"><?= number_format($pendingAssignments) ?></h5>
+                                <p class="text-muted mb-0 small">Pending Assignments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge bg-info rounded-circle p-3 fs-4">📊</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-info mb-1">0%</h5>
+                                <p class="text-muted mb-0 small">Average Grade</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <?php if ($user['role'] === 'admin'): ?>
+            <!-- Admin Dashboard Content -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">🔧 Quick Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <a href="#" class="btn btn-outline-primary d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">👥</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">Manage Users</div>
+                                    <small class="text-muted">Add, edit, or remove users</small>
+                                </div>
+                            </a>
+                            <a href="#" class="btn btn-outline-success d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">📚</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">Manage Courses</div>
+                                    <small class="text-muted">Create and manage courses</small>
+                                </div>
+                            </a>
+                            <a href="#" class="btn btn-outline-info d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">📊</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">View Reports</div>
+                                    <small class="text-muted">Analytics and reports</small>
+                                </div>
+                            </a>
+                            <a href="#" class="btn btn-outline-secondary d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">⚙️</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">System Settings</div>
+                                    <small class="text-muted">Configure system settings</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">📋 Recent User Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($recentUsers)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($recentUsers as $recentUser): ?>
+                                            <tr>
+                                                <td class="fw-semibold"><?= esc($recentUser['name']) ?></td>
+                                                <td class="text-muted"><?= esc($recentUser['email']) ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?= $recentUser['role'] === 'admin' ? 'danger' : ($recentUser['role'] === 'teacher' ? 'success' : 'primary') ?> rounded-pill">
+                                                        <?= ucfirst($recentUser['role']) ?>
+                                                    </span>
+                                                </td>
+                                                <td class="text-muted small"><?= date('M j, Y', strtotime($recentUser['created_at'])) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-4">
+                                <span class="text-muted">No recent activity found.</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($user['role'] === 'teacher'): ?>
+            <!-- Teacher Dashboard Content -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0">📚 My Courses</h5>
+                            <button class="btn btn-primary btn-sm">
+                                <span class="me-1">➕</span> Create New Course
+                            </button>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">🔔 Recent Notifications</h5>
+                    </div>
+                </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">⚡ Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">📚</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">Create New Lesson</div>
+                                    <small class="text-muted">Add content to your courses</small>
+                                </div>
+                            </button>
+                            <button class="btn btn-outline-success d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">📝</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">Create Assignment</div>
+                                    <small class="text-muted">Give students new tasks</small>
+                                </div>
+                            </button>
+                            <button class="btn btn-outline-info d-flex align-items-center justify-content-start p-3">
+                                <span class="me-3">📊</span>
+                                <div class="text-start">
+                                    <div class="fw-bold">View Gradebook</div>
+                                    <small class="text-muted">Review student performance</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <!-- Student Dashboard Content -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0">📚 My Enrolled Courses</h5>
+                            <button class="btn btn-primary btn-sm">
+                                <span class="me-1">🔍</span> Browse Courses
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">⏰ Upcoming Deadlines</h5>
+                    </div>
+                </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">📊 Recent Grades</h5>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($user['role'] === 'admin'): ?>
+        <!-- System Overview Section for Admin -->
+        <div class="row g-4 mt-2">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold mb-0">📈 System Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="fw-bold text-muted mb-3">User Distribution</h6>
+                                    <div class="mb-2">
+                                        <span class="badge bg-danger me-2">Admin</span>
+                                        <span class="fw-bold"><?= $totalAdmins ?></span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-success me-2">Teachers</span>
+                                        <span class="fw-bold"><?= $totalTeachers ?></span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary me-2">Students</span>
+                                        <span class="fw-bold"><?= $totalStudents ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="fw-bold text-muted mb-3">System Status</h6>
+                                    <div class="mb-2">
+                                        <span class="badge bg-success me-2">●</span>
+                                        <span>System Online</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-info me-2">●</span>
+                                        <span>Database Connected</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary me-2">●</span>
+                                        <span>All Services Running</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <h6 class="fw-bold text-muted mb-3">Quick Stats</h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Last Login:</small>
+                                        <div class="fw-bold"><?= date('F j, Y g:i A') ?></div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Server Status:</small>
+                                        <div class="fw-bold text-success">Online</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
 </body>
 </html>

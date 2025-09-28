@@ -19,7 +19,7 @@
     
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background-color: #1e3a8a;">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="<?= $isLoggedIn ? base_url($userRole . '/dashboard') : base_url() ?>">
+            <a class="navbar-brand fw-bold fs-4" href="<?= $isLoggedIn ? base_url('dashboard') : base_url() ?>">
                 📚 MARUHOM LMS
                 <?php if ($isLoggedIn): ?>
                     <span class="badge bg-light text-dark ms-2 rounded-pill fw-bold">
@@ -36,7 +36,7 @@
                 <ul class="navbar-nav me-auto">
                     <?php if ($isLoggedIn): ?>
                         <li class="nav-item">
-                            <a class="nav-link px-3 fw-bold" href="<?= base_url($userRole . '/dashboard') ?>">
+                            <a class="nav-link px-3 fw-bold" href="<?= base_url('dashboard') ?>">
                                 🏠 Dashboard
                             </a>
                         </li>
@@ -203,5 +203,9 @@
             <?php endif; ?>
     </div>
 
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+            crossorigin="anonymous"></script>
 </body>
 </html>
