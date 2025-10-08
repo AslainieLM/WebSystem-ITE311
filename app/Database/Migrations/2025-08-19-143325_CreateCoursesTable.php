@@ -17,7 +17,7 @@ class CreateCoursesTable extends Migration
             ],
             'title' => [
                 'type'       => 'VARCHAR',
-                'constraint' => 255,
+                'constraint' => 200,
             ],
             'description' => [
                 'type' => 'TEXT',
@@ -37,30 +37,20 @@ class CreateCoursesTable extends Migration
                 'constraint' => 100,
                 'null'       => true,
             ],
+            'credits' => [
+                'type'       => 'INT',
+                'constraint' => 2,
+                'default'    => 3,
+            ],
             'duration_weeks' => [
                 'type'       => 'INT',
                 'constraint' => 3,
-                'null'       => true,
+                'default'    => 16,
             ],
             'max_students' => [
                 'type'       => 'INT',
-                'constraint' => 5,
-                'null'       => true,
-            ],
-            'price' => [
-                'type'       => 'DECIMAL',
-                'constraint' => '10,2',
-                'default'    => 0.00,
-            ],
-            'thumbnail' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-                'null'       => true,
-            ],
-            'status' => [
-                'type'       => 'ENUM',
-                'constraint' => ['draft', 'published', 'archived'],
-                'default'    => 'draft',
+                'constraint' => 4,
+                'default'    => 30,
             ],
             'start_date' => [
                 'type' => 'DATE',
@@ -70,22 +60,26 @@ class CreateCoursesTable extends Migration
                 'type' => 'DATE',
                 'null' => true,
             ],
+            'status' => [
+                'type'       => 'ENUM',
+                'constraint' => ['draft', 'active', 'completed', 'cancelled'],
+                'default'    => 'draft',
+            ],
             'created_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
+                'type'    => 'DATETIME',
+                'null'    => true,
             ],
             'updated_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
+                'type'    => 'DATETIME',
+                'null'    => true,
             ],
         ]);
 
         $this->forge->addKey('id', true);
         $this->forge->addKey('instructor_id');
         $this->forge->addKey('course_code');
-        $this->forge->createTable('courses');
-
         $this->forge->addForeignKey('instructor_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('courses');
     }
 
     public function down()

@@ -15,7 +15,7 @@ class CreateEnrollmentsTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'student_id' => [
+            'user_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'unsigned'   => true,
@@ -26,49 +26,16 @@ class CreateEnrollmentsTable extends Migration
                 'unsigned'   => true,
             ],
             'enrollment_date' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
-            ],
-            'completion_date' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
-            ],
-            'status' => [
-                'type'       => 'ENUM',
-                'constraint' => ['active', 'completed', 'dropped', 'suspended'],
-                'default'    => 'active',
-            ],
-            'progress_percentage' => [
-                'type'       => 'DECIMAL',
-                'constraint' => '5,2',
-                'default'    => 0.00,
-            ],
-            'grade' => [
-                'type'       => 'CHAR',
-                'constraint' => 2,
-                'null'       => true,
-            ],
-            'final_score' => [
-                'type'       => 'DECIMAL',
-                'constraint' => '5,2',
-                'null'       => true,
-            ],
-            'created_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
-            ],
-            'updated_at' => [
-                'type' => 'TIMESTAMP',
-                'null' => true,
+                'type'    => 'DATETIME',
+                'null'    => false,
             ],
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addUniqueKey(['student_id', 'course_id']); // Composite unique key
-        $this->forge->createTable('enrollments');
-
-        $this->forge->addForeignKey('student_id', 'users', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addKey(['user_id', 'course_id']);
+        $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('course_id', 'courses', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('enrollments');
     }
 
     public function down()

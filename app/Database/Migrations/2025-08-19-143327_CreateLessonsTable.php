@@ -80,9 +80,8 @@ class CreateLessonsTable extends Migration
         $this->forge->addKey('id', true);
         $this->forge->addKey('course_id');
         $this->forge->addKey('lesson_order');
-        $this->forge->createTable('lessons');
-
         $this->forge->addForeignKey('course_id', 'courses', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('lessons');
     }
 
     public function down()

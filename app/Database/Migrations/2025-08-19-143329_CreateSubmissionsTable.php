@@ -89,11 +89,10 @@ class CreateSubmissionsTable extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addKey(['quiz_id', 'student_id', 'attempt_number']);
-        $this->forge->createTable('submissions');
-
         $this->forge->addForeignKey('quiz_id', 'quizzes', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('student_id', 'users', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('graded_by', 'users', 'id', 'SET NULL', 'CASCADE');
+        $this->forge->createTable('submissions');
     }
 
     public function down()
