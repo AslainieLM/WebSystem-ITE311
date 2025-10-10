@@ -188,9 +188,35 @@ class Auth extends BaseController
                 return view('auth/dashboard', $dashboardData);
                 
             case 'student':
+                // Load models for student data
+                $enrollmentModel = new \App\Models\EnrollmentModel();
+                $courseModel = new \App\Models\CourseModel();
+                
+                $userId = $this->session->get('userID');
+                
+                // Get enrolled courses
+                $enrolledCoursesData = $enrollmentModel->getUserEnrollments($userId);
+                $enrolledCoursesCount = count($enrolledCoursesData);
+                
+                // Get available courses (not enrolled)
+                $allActiveCourses = $courseModel->getActiveCourses();
+                $enrolledCourseIds = array_column($enrolledCoursesData, 'course_id');
+                $availableCourses = array_filter($allActiveCourses, function($course) use ($enrolledCourseIds) {
+                    return !in_array($course['id'], $enrolledCourseIds);
+                });
+                
+                // Add enrollment count to available courses
+                foreach ($availableCourses as &$course) {
+                    $course['current_enrollments'] = $enrollmentModel->where('course_id', $course['id'])->countAllResults();
+                    $course['spots_remaining'] = $course['max_students'] - $course['current_enrollments'];
+                    $course['is_full'] = $course['current_enrollments'] >= $course['max_students'];
+                }
+                
                 $dashboardData = array_merge($baseData, [
                     'title' => 'Student Dashboard - MARUHOM LMS',
-                    'enrolledCourses' => 0,
+                    'enrolledCourses' => $enrolledCoursesCount,
+                    'enrolledCoursesData' => $enrolledCoursesData,
+                    'availableCourses' => array_values($availableCourses),
                     'completedAssignments' => 0,
                     'pendingAssignments' => 0
                 ]);
