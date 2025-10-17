@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
         // Users data
         $users = [
             [
-                'name'    => 'aslainie_lm',
+                'name'    => 'aslainie maruhom',
                 'email'       => 'aslainie@gmail.com',
                 'password'    => password_hash('aslainie', PASSWORD_DEFAULT),
                 'role'        => 'admin',
@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'name'    => 'norami_marohombsar',
+                'name'    => 'norami marohombsar',
                 'email'       => 'norami@gmail.com',
                 'password'    => password_hash('norami', PASSWORD_DEFAULT),
                 'role'        => 'teacher',
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'name'    => 'baikan_lampac',
+                'name'    => 'baikan lampac',
                 'email'       => 'baikan@gmail.com',
                 'password'    => password_hash('baikan', PASSWORD_DEFAULT),
                 'role'        => 'student',
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'name'    => 'amarah_tador',
+                'name'    => 'amarah tador',
                 'email'       => 'amarah@gmail.com',
                 'password'    => password_hash('amarah', PASSWORD_DEFAULT),
                 'role'        => 'teacher',
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
                 'updated_at'  => date('Y-m-d H:i:s'),
             ],
             [
-                'name'    => 'anisah_lampac',
+                'name'    => 'anisah lampac',
                 'email'       => 'anisah@gmail.com',
                 'password'    => password_hash('anisah', PASSWORD_DEFAULT),
                 'role'        => 'student',

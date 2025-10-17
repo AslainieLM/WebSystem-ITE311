@@ -44,12 +44,12 @@
                         <?php if ($userRole === 'admin'): ?>
                             <!-- Admin Navigation -->
                             <li class="nav-item">
-                                <a class="nav-link px-3 fw-bold" href="#">
+                                <a class="nav-link px-3 fw-bold" href="<?= base_url('admin/manage_users') ?>">
                                     👥 Manage Users
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link px-3 fw-bold" href="#">
+                                <a class="nav-link px-3 fw-bold" href="<?= base_url('admin/manage_courses') ?>">
                                     📚 Manage Courses
                                 </a>
                             </li>
@@ -66,7 +66,7 @@
                         <?php elseif ($userRole === 'teacher'): ?>
                             <!-- Teacher Navigation -->
                             <li class="nav-item">
-                                <a class="nav-link px-3 fw-bold" href="#">
+                                <a class="nav-link px-3 fw-bold" href="<?= base_url('teacher/courses') ?>">
                                     📚 My Courses
                                 </a>
                             </li>
@@ -88,7 +88,7 @@
                         <?php elseif ($userRole === 'student'): ?>
                             <!-- Student Navigation -->
                             <li class="nav-item">
-                                <a class="nav-link px-3 fw-bold" href="#">
+                                <a class="nav-link px-3 fw-bold" href="<?= base_url('student/courses') ?>">
                                     📚 My Courses
                                 </a>
                             </li>

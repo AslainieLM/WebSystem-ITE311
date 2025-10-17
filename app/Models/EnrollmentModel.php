@@ -134,12 +134,9 @@ class EnrollmentModel extends Model
                     c.start_date,
                     c.end_date,
                     c.status as course_status,
-                    c.instructor_id,
-                    u.name as instructor_name,
-                    u.email as instructor_email
+                    c.instructor_ids
                 ')
                 ->join('courses c', 'e.course_id = c.id', 'left')
-                ->join('users u', 'c.instructor_id = u.id', 'left')
                 ->where('e.user_id', $user_id)
                 ->orderBy('e.enrollment_date', 'DESC')
                 ->get()
@@ -147,6 +144,23 @@ class EnrollmentModel extends Model
 
             // Process and format the results
             foreach ($enrollments as &$enrollment) {
+                // Get instructor names from instructor_ids JSON field
+                $instructorIds = json_decode($enrollment['instructor_ids'] ?? '[]', true);
+                $instructorNames = [];
+                
+                if (!empty($instructorIds)) {
+                    $instructors = $db->table('users')
+                        ->select('name')
+                        ->whereIn('id', $instructorIds)
+                        ->get()
+                        ->getResultArray();
+                    
+                    $instructorNames = array_column($instructors, 'name');
+                }
+                
+                $enrollment['instructor_name'] = !empty($instructorNames) ? implode(', ', $instructorNames) : 'No instructor assigned';
+                $enrollment['instructor_email'] = ''; // Not retrieved in this query for performance
+                
                 // Format dates for better display
                 $enrollment['enrollment_date_formatted'] = date('M j, Y', strtotime($enrollment['enrollment_date']));
                 $enrollment['start_date_formatted'] = $enrollment['start_date'] ? date('M j, Y', strtotime($enrollment['start_date'])) : 'TBA';

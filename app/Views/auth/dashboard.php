@@ -117,7 +117,7 @@
                             </div>
                             <div>
                                 <h5 class="fw-bold text-primary mb-1"><?= number_format($totalCourses) ?></h5>
-                                <p class="text-muted mb-0 small">My Courses</p>
+                                <p class="text-muted mb-0 small">Total Courses</p>
                             </div>
                         </div>
                     </div>
@@ -128,11 +128,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
-                                <span class="badge bg-success rounded-circle p-3 fs-4">👨‍🎓</span>
+                                <span class="badge bg-success rounded-circle p-3 fs-4">✅</span>
                             </div>
                             <div>
-                                <h5 class="fw-bold text-success mb-1"><?= number_format($totalStudents) ?></h5>
-                                <p class="text-muted mb-0 small">Total Students</p>
+                                <h5 class="fw-bold text-success mb-1"><?= number_format($activeCourses) ?></h5>
+                                <p class="text-muted mb-0 small">Active Courses</p>
                             </div>
                         </div>
                     </div>
@@ -146,8 +146,8 @@
                                 <span class="badge bg-warning rounded-circle p-3 fs-4">📝</span>
                             </div>
                             <div>
-                                <h5 class="fw-bold text-warning mb-1">0</h5>
-                                <p class="text-muted mb-0 small">Pending Reviews</p>
+                                <h5 class="fw-bold text-warning mb-1"><?= number_format($draftCourses) ?></h5>
+                                <p class="text-muted mb-0 small">Draft Courses</p>
                             </div>
                         </div>
                     </div>
@@ -158,11 +158,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
-                                <span class="badge bg-info rounded-circle p-3 fs-4">📋</span>
+                                <span class="badge bg-info rounded-circle p-3 fs-4">�</span>
                             </div>
                             <div>
-                                <h5 class="fw-bold text-info mb-1">0</h5>
-                                <p class="text-muted mb-0 small">Active Assignments</p>
+                                <h5 class="fw-bold text-info mb-1"><?= number_format($totalMaterials) ?></h5>
+                                <p class="text-muted mb-0 small">Course Materials</p>
                             </div>
                         </div>
                     </div>
@@ -219,11 +219,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
-                                <span class="badge bg-info rounded-circle p-3 fs-4">📊</span>
+                                <span class="badge bg-info rounded-circle p-3 fs-4">�</span>
                             </div>
                             <div>
-                                <h5 class="fw-bold text-info mb-1">0%</h5>
-                                <p class="text-muted mb-0 small">Average Grade</p>
+                                <h5 class="fw-bold text-info mb-1"><?= number_format($totalMaterials) ?></h5>
+                                <p class="text-muted mb-0 small">Total Materials</p>
                             </div>
                         </div>
                     </div>
@@ -319,48 +319,74 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-0 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold mb-0">📚 My Courses</h5>
-                            <button class="btn btn-primary btn-sm">
-                                <span class="me-1">➕</span> Create New Course
-                            </button>
+                            <h5 class="fw-bold mb-0">📚 Course Status Overview</h5>
+                            <a href="<?= base_url('teacher/courses') ?>" class="btn btn-primary btn-sm">
+                                <span class="me-1">📚</span> View All Courses
+                            </a>
                         </div>
-                    </div>  
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h3 class="fw-bold text-primary mb-1"><?= $activeCourses ?></h3>
+                                    <small class="text-muted">Active</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h3 class="fw-bold text-warning mb-1"><?= $draftCourses ?></h3>
+                                    <small class="text-muted">Draft</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 border rounded">
+                                    <h3 class="fw-bold text-success mb-1"><?= $completedCourses ?></h3>
+                                    <small class="text-muted">Completed</small>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if ($totalStudents > 0): ?>
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small">Total Enrolled Students</span>
+                                    <span class="badge bg-success"><?= number_format($totalStudents) ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small">Total Course Materials</span>
+                                    <span class="badge bg-info"><?= number_format($totalMaterials) ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0 pb-0">
-                        <h5 class="fw-bold mb-0">🔔 Recent Notifications</h5>
-                    </div>
-                </div>
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 pb-0">
-                        <h5 class="fw-bold mb-0">⚡ Quick Actions</h5>
+                        <h5 class="fw-bold mb-0">�‍🎓 Recent Enrollments</h5>
                     </div>
                     <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-outline-primary d-flex align-items-center justify-content-start p-3">
-                                <span class="me-3">📚</span>
-                                <div class="text-start">
-                                    <div class="fw-bold">Create New Lesson</div>
-                                    <small class="text-muted">Add content to your courses</small>
-                                </div>
-                            </button>
-                            <button class="btn btn-outline-success d-flex align-items-center justify-content-start p-3">
-                                <span class="me-3">📝</span>
-                                <div class="text-start">
-                                    <div class="fw-bold">Create Assignment</div>
-                                    <small class="text-muted">Give students new tasks</small>
-                                </div>
-                            </button>
-                            <button class="btn btn-outline-info d-flex align-items-center justify-content-start p-3">
-                                <span class="me-3">📊</span>
-                                <div class="text-start">
-                                    <div class="fw-bold">View Gradebook</div>
-                                    <small class="text-muted">Review student performance</small>
-                                </div>
-                            </button>
-                        </div>
+                        <?php if (!empty($recentEnrollments)): ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($recentEnrollments as $enrollment): ?>
+                                    <div class="list-group-item px-0 border-0 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold"><?= esc($enrollment['student_name']) ?></h6>
+                                                <p class="mb-1 small text-muted"><?= esc($enrollment['course_title']) ?></p>
+                                                <small class="text-muted"><?= date('M j, Y', strtotime($enrollment['enrollment_date'])) ?></small>
+                                            </div>
+                                            <span class="badge bg-success">New</span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-4">
+                                <span class="text-muted">No recent enrollments</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -413,76 +439,36 @@
                 </div>
             </div>
             
-            <!-- Available Courses Section -->
+            <!-- Recent Materials Section -->
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm mb-4">
+                <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 pb-0">
-                        <h5 class="fw-bold mb-0">🔍 Available Courses</h5>
+                        <h5 class="fw-bold mb-0">� Recent Materials</h5>
                     </div>
                     <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                        <?php if (!empty($availableCourses)): ?>
-                            <div id="available-courses-list">
-                                <?php foreach ($availableCourses as $course): ?>
-                                    <div class="card mb-3 course-card" data-course-id="<?= $course['id'] ?>">
-                                        <div class="card-body p-3">
-                                            <h6 class="fw-bold mb-1"><?= esc($course['title']) ?></h6>
-                                            <p class="text-muted small mb-2"><?= esc($course['course_code']) ?> • <?= esc($course['credits']) ?> Credits</p>
-                                            <p class="small mb-2"><?= esc(substr($course['description'] ?? '', 0, 80)) ?>...</p>
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <small class="text-muted">
-                                                    <?= $course['current_enrollments'] ?>/<?= $course['max_students'] ?> enrolled
-                                                </small>
-                                                <small class="text-muted">
-                                                    <?= esc($course['instructor_name']) ?>
-                                                </small>
+                        <?php if (!empty($recentMaterials)): ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($recentMaterials as $material): ?>
+                                    <div class="list-group-item px-0 border-0 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 fw-bold small"><?= esc($material['file_name']) ?></h6>
+                                                <p class="mb-1 small text-muted"><?= esc($material['course_title'] ?? 'Unknown Course') ?></p>
+                                                <small class="text-muted"><?= date('M j, Y', strtotime($material['created_at'])) ?></small>
                                             </div>
-                                            <?php if ($course['is_full']): ?>
-                                                <button class="btn btn-secondary btn-sm w-100" disabled>
-                                                    Course Full
-                                                </button>
-                                            <?php else: ?>
-                                                <button class="btn btn-primary btn-sm w-100 enroll-btn" 
-                                                        data-course-id="<?= $course['id'] ?>"
-                                                        data-course-title="<?= esc($course['title']) ?>">
-                                                    <span class="me-1">➕</span> Enroll Now
-                                                </button>
-                                            <?php endif; ?>
+                                            <a href="<?= base_url('material/view/' . $material['id']) ?>" 
+                                               class="btn btn-sm btn-outline-primary ms-2" target="_blank">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
                         <?php else: ?>
                             <div class="text-center py-4">
-                                <span class="text-muted">No available courses at this time.</span>
+                                <span class="text-muted">No recent materials</span>
                             </div>
                         <?php endif; ?>
-                    </div>
-                </div>
-                
-                <!-- Quick Stats -->
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 pb-0">
-                        <h5 class="fw-bold mb-0">📊 Learning Progress</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="small">Completed Assignments</span>
-                                <span class="fw-bold"><?= $completedAssignments ?></span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="small">Pending Assignments</span>
-                                <span class="fw-bold text-warning"><?= $pendingAssignments ?></span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="small">Total Courses</span>
-                                <span class="fw-bold text-primary"><?= $enrolledCourses ?></span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -492,7 +478,6 @@
     <!-- Alert Container for notifications -->
     <div id="alert-container" class="mt-3"></div>
 
-    <!-- Additional Course Details Section for Students -->
     <?php if ($user['role'] === 'student' && !empty($availableCourses)): ?>
         <div class="row g-4 mt-2">
             <div class="col-12">
