@@ -131,4 +131,6 @@ class MaterialModel extends Model
             return [];
         }
     }
+    
 }
+
