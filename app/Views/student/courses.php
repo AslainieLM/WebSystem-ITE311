@@ -394,9 +394,14 @@ function enrollCourse(courseId, courseTitle) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enrolling...';
     
+    // Get CSRF token from meta tag
+    const csrfMeta = document.querySelector('meta[name^="csrf"]');
+    const csrfName = csrfMeta ? csrfMeta.getAttribute('name') : '<?= csrf_token() ?>';
+    const csrfHash = csrfMeta ? csrfMeta.getAttribute('content') : '<?= csrf_hash() ?>';
+    
     const formData = new FormData();
     formData.append('course_id', courseId);
-    formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+    formData.append(csrfName, csrfHash);
     
     fetch('<?= base_url('course/enroll') ?>', {
         method: 'POST',
@@ -407,20 +412,33 @@ function enrollCourse(courseId, courseTitle) {
     })
     .then(response => response.json())
     .then(data => {
+        // Update CSRF token in meta tag if new token is provided
+        if (data.csrf_hash && csrfMeta) {
+            csrfMeta.setAttribute('content', data.csrf_hash);
+        }
+        
         if (data.success) {
             alert(data.message || 'Successfully enrolled in the course!');
             window.location.reload();
         } else {
-            alert(data.message || 'Failed to enroll in the course.');
+            // Show detailed error message for debugging
+            let errorMsg = data.message || 'Failed to enroll in the course.';
+            if (data.error_details) {
+                errorMsg += '\n\nError details: ' + data.error_details;
+            }
+            if (data.error_code) {
+                errorMsg += '\nError code: ' + data.error_code;
+            }
+            alert(errorMsg);
             btn.disabled = false;
             btn.innerHTML = originalContent;
         }
     })
     .catch(error => {
-        alert('An error occurred while enrolling. Please try again.');
+        console.error('Enrollment error:', error);
+        alert('An error occurred while enrolling. Please try again.\n\nError: ' + error.message);
         btn.disabled = false;
         btn.innerHTML = originalContent;
-        console.error('Error:', error);
     });
 }
 
@@ -518,8 +536,5 @@ $(document).ready(function() {
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
-        crossorigin="anonymous"></script>
 </body>
 </html>
