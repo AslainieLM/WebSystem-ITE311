@@ -12,7 +12,7 @@ class Notifications extends BaseController
     
     public function __construct()
     {
-        $this->notificationModel = new \App\Models\NotificationModel();
+        $this->notificationModel = new \App\Models\NotificationsModel();
         $this->session = \Config\Services::session();
     }
       
@@ -110,12 +110,14 @@ class Notifications extends BaseController
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Notification marked as read',
-                'unread_count' => $unreadCount
+                'unread_count' => $unreadCount,
+                'csrf_hash' => csrf_hash()
             ]);
         } else {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Failed to mark notification as read'
+                'message' => 'Failed to mark notification as read',
+                'csrf_hash' => csrf_hash()
             ])->setStatusCode(500);
         }
     }
