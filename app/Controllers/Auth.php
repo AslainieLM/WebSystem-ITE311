@@ -14,6 +14,34 @@ class Auth extends BaseController
         $this->validation = \Config\Services::validation();
         $this->db = \Config\Database::connect();
     }
+    
+    /**
+     * Create notification for user
+     * 
+     * @param int $userId User ID to receive notification
+     * @param string $message Notification message
+     * @return bool Success status
+     */
+    private function createNotification($userId, $message)
+    {
+        try {
+            $notificationModel = new \App\Models\NotificationsModel();
+            $philippineTimezone = new \DateTimeZone('Asia/Manila');
+            $currentDateTime = new \DateTime('now', $philippineTimezone);
+            
+            $notificationData = [
+                'user_id' => $userId,
+                'message' => $message,
+                'is_read' => 0,
+                'created_at' => $currentDateTime->format('Y-m-d H:i:s')
+            ];
+            
+            return $notificationModel->insert($notificationData);
+        } catch (\Exception $e) {
+            log_message('error', 'Notification creation error: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function register()
     {
@@ -1273,6 +1301,25 @@ class Auth extends BaseController
         ];
         
         if ($courseBuilder->where('id', $courseID)->update($updateData)) {
+            // Step 7: Notify admin(s) and the teacher about course assignment
+            $teacherName = $this->session->get('name');
+            $courseName = $course['title'];
+            
+            // Notify all admins
+            $admins = $this->db->table('users')->where('role', 'admin')->get()->getResultArray();
+            foreach ($admins as $admin) {
+                $this->createNotification(
+                    $admin['id'],
+                    "Teacher '{$teacherName}' has self-assigned to course '{$courseName}'"
+                );
+            }
+            
+            // Notify the teacher themselves
+            $this->createNotification(
+                $teacherID,
+                "You have been successfully assigned to teach '{$courseName}'"
+            );
+            
             $assignmentActivity = [
                 'type' => 'course_assignment',
                 'icon' => '👨‍🏫',

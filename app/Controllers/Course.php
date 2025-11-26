@@ -17,6 +17,34 @@ class Course extends BaseController
         
         $this->enrollmentModel = new EnrollmentModel();
     }
+    
+    /**
+     * Create notification for user
+     * 
+     * @param int $userId User ID to receive notification
+     * @param string $message Notification message
+     * @return bool Success status
+     */
+    private function createNotification($userId, $message)
+    {
+        try {
+            $notificationModel = new \App\Models\NotificationsModel();
+            $philippineTimezone = new \DateTimeZone('Asia/Manila');
+            $currentDateTime = new \DateTime('now', $philippineTimezone);
+            
+            $notificationData = [
+                'user_id' => $userId,
+                'message' => $message,
+                'is_read' => 0,
+                'created_at' => $currentDateTime->format('Y-m-d H:i:s')
+            ];
+            
+            return $notificationModel->insert($notificationData);
+        } catch (\Exception $e) {
+            log_message('error', 'Notification creation error: ' . $e->getMessage());
+            return false;
+        }
+    }
     public function enroll()
     {
         $this->response->setContentType('application/json');
@@ -53,53 +81,8 @@ class Course extends BaseController
             ])->setStatusCode(400);
         }
 
-        try {
-            $config = config('Security');
-            if ($config->csrfProtection !== false && $config->csrfProtection !== '') {
-                
-                $tokenName = $config->csrfTokenName ?? 'csrf_token_name';
-                $headerName = $config->csrfHeaderName ?? 'X-CSRF-TOKEN';
-                
-                $submittedToken = $this->request->getPost($tokenName) ?? $this->request->getHeaderLine($headerName);
-                
-                $expectedToken = csrf_hash();
-                
-                if (empty($submittedToken) || empty($expectedToken)) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'Security token is missing. Please refresh the page and try again.',
-                        'error_code' => 'CSRF_MISSING',
-                        'csrf_hash' => csrf_hash(),
-                        'debug' => [
-                            'submitted_token_empty' => empty($submittedToken),
-                            'expected_token_empty' => empty($expectedToken),
-                            'token_name' => $tokenName
-                        ]
-                    ])->setStatusCode(403);
-                }
-                
-                if (!hash_equals($expectedToken, $submittedToken)) {
-                    return $this->response->setJSON([
-                        'success' => false,
-                        'message' => 'Security token validation failed. Please refresh the page and try again.',
-                        'error_code' => 'CSRF_INVALID',
-                        'csrf_hash' => csrf_hash(),
-                        'debug' => [
-                            'submitted_token' => substr($submittedToken, 0, 10) . '...',
-                            'expected_token' => substr($expectedToken, 0, 10) . '...',
-                            'tokens_match' => false
-                        ]
-                    ])->setStatusCode(403);
-                }
-            }
-        } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'CSRF validation error: ' . $e->getMessage(),
-                'error_code' => 'CSRF_EXCEPTION',
-                'csrf_hash' => csrf_hash()
-            ])->setStatusCode(403);
-        }
+        // CSRF validation is automatically handled by CodeIgniter's CSRF filter
+        // No manual validation needed since 'csrf' filter is enabled in app/Config/Filters.php
 
         $course_id = $this->request->getPost('course_id');
         
@@ -139,6 +122,16 @@ class Course extends BaseController
             $enrollmentResult = $this->enrollmentModel->enrollUser($enrollmentData);
 
             if ($enrollmentResult) {
+                // Step 7: Create notification for student upon enrollment
+                $db = \Config\Database::connect();
+                $course = $db->table('courses')->select('title')->where('id', $course_id)->get()->getRowArray();
+                $courseName = $course['title'] ?? 'the course';
+                
+                $this->createNotification(
+                    $user_id, 
+                    "You have successfully enrolled in '{$courseName}'!"
+                );
+                
                 return $this->response->setJSON([
                     'success' => true,
                     'message' => 'Successfully enrolled in the course!',
@@ -162,11 +155,13 @@ class Course extends BaseController
 
         } catch (\Exception $e) {
             log_message('error', 'Course enrollment error: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
             
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'An unexpected error occurred. Please try again later.',
                 'error_code' => 'INTERNAL_ERROR',
+                'error_details' => $e->getMessage(), // Added for debugging
                 'csrf_hash' => csrf_hash()
             ])->setStatusCode(500);
         }
@@ -455,6 +450,13 @@ class Course extends BaseController
             $addResult = $db->table('enrollments')->insert($enrollmentData);
 
             if ($addResult) {
+                // Step 7: Notify student when teacher adds them to a course
+                $teacherName = $this->session->get('name');
+                $this->createNotification(
+                    $student_id,
+                    "You have been enrolled in '{$course['title']}' by {$teacherName}"
+                );
+                
                 log_message('info', 'Teacher ' . $this->session->get('name') . ' (ID: ' . $teacher_id . ') added student ' . $student['name'] . ' (ID: ' . $student_id . ') to course "' . $course['title'] . '" (ID: ' . $course_id . ')');
 
                 return $this->response->setJSON([
@@ -570,5 +572,37 @@ class Course extends BaseController
                 'error_code' => 'INTERNAL_ERROR'
             ])->setStatusCode(500);
         }
+    }
+
+    /**
+     * Search courses by name or description
+     * Accepts GET or POST requests with search_term parameter
+     * Returns JSON for AJAX requests or renders view for regular requests
+     */
+    public function search()
+    {
+        // Get search term from GET or POST request
+        $searchTerm = $this->request->getGet('search_term') ?? $this->request->getPost('search_term');
+
+        // Get database instance
+        $db = \Config\Database::connect();
+        $builder = $db->table('courses');
+
+        // If search term is provided, apply LIKE queries
+        if (!empty($searchTerm)) {
+            $builder->like('title', $searchTerm);
+            $builder->orLike('description', $searchTerm);
+        }
+
+        // Get all matching courses
+        $courses = $builder->get()->getResultArray();
+
+        // Check if this is an AJAX request
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['courses' => $courses]);
+        }
+
+        // Return view for regular requests
+        return view('courses/search_results', ['courses' => $courses, 'searchTerm' => $searchTerm]);
     }
 }

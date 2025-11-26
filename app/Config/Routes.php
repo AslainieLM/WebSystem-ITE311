@@ -34,6 +34,8 @@ $routes->get('/course/available', 'Course::getAvailableCourses');
 $routes->post('/course/removeStudent', 'Course::removeStudent');
 $routes->post('/course/addStudent', 'Course::addStudent');
 $routes->get('/course/getAvailableStudents', 'Course::getAvailableStudents');
+$routes->get('/course/search', 'Course::search');
+$routes->post('/course/search', 'Course::search');
 
 $routes->get('/material/upload/(:num)', 'Material::upload/$1');
 $routes->post('/material/upload/(:num)', 'Material::upload/$1');
@@ -41,4 +43,7 @@ $routes->get('/material/delete/(:num)', 'Material::delete/$1');
 $routes->get('/material/download/(:num)', 'Material::download/$1');
 $routes->get('/material/view/(:num)', 'Material::view/$1');
 
+// Notification routes
+$routes->get('/notifications', 'Notifications::get');
+$routes->post('/notifications/mark_read/(:num)', 'Notifications::mark_as_read/$1');
 

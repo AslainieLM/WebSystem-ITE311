@@ -8,52 +8,21 @@ class CourseSeeder extends Seeder
 {
     public function run()
     {
-        // First, create some teacher users if they don't exist
         $db = \Config\Database::connect();
         
-        // Check if we have any teachers
-        $teacherCount = $db->table('users')->where('role', 'teacher')->countAllResults();
-        
-        if ($teacherCount == 0) {
-            // Create a sample teacher
-            $teacherData = [
-                [
-                    'name' => 'Dr. Jane Smith',
-                    'email' => 'jane.smith@maruhom.edu',
-                    'password' => password_hash('teacher123', PASSWORD_DEFAULT),
-                    'role' => 'teacher',
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ],
-                [
-                    'name' => 'Prof. John Doe',
-                    'email' => 'john.doe@maruhom.edu',
-                    'password' => password_hash('teacher123', PASSWORD_DEFAULT),
-                    'role' => 'teacher',
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ],
-                [
-                    'name' => 'Dr. Alice Johnson',
-                    'email' => 'alice.johnson@maruhom.edu',
-                    'password' => password_hash('teacher123', PASSWORD_DEFAULT),
-                    'role' => 'teacher',
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]
-            ];
-            
-            $db->table('users')->insertBatch($teacherData);
-        }
-        
-        // Get teacher IDs
+        // Get existing teacher IDs from UserSeeder
         $teachers = $db->table('users')->where('role', 'teacher')->get()->getResultArray();
         $teacherIds = array_column($teachers, 'id');
         
         if (empty($teacherIds)) {
-            echo "No teachers found. Please create teacher accounts first.\n";
+            echo "No teachers found. Please run UserSeeder first to create teacher accounts.\n";
             return;
         }
+        
+        echo "Found " . count($teacherIds) . " teacher(s) in the database.\n";
+        
+        // Distribute courses among available teachers
+        $teacherCount = count($teacherIds);
         
         // Sample course data
         $courses = [
@@ -61,7 +30,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Introduction to Programming',
                 'description' => 'Learn the fundamentals of programming using modern languages and development practices. This course covers variables, control structures, functions, and basic algorithms.',
                 'course_code' => 'CS101',
-                'instructor_ids' => json_encode([$teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[0 % $teacherCount]]),
                 'category' => 'Computer Science',
                 'credits' => 3,
                 'duration_weeks' => 16,
@@ -76,7 +45,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Web Development Fundamentals',
                 'description' => 'Comprehensive introduction to web development including HTML, CSS, JavaScript, and modern frameworks. Build real-world projects and learn industry best practices.',
                 'course_code' => 'WEB201',
-                'instructor_ids' => json_encode([$teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[1 % $teacherCount]]),
                 'category' => 'Web Development',
                 'credits' => 4,
                 'duration_weeks' => 14,
@@ -91,7 +60,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Database Design and Management',
                 'description' => 'Learn how to design, implement, and manage relational databases. Topics include SQL, normalization, indexing, and database optimization techniques.',
                 'course_code' => 'DB301',
-                'instructor_ids' => json_encode([count($teacherIds) > 1 ? $teacherIds[1] : $teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[0 % $teacherCount]]),
                 'category' => 'Database',
                 'credits' => 3,
                 'duration_weeks' => 12,
@@ -106,7 +75,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Mobile App Development',
                 'description' => 'Build native and cross-platform mobile applications. Learn iOS and Android development, UI/UX design principles, and app store deployment.',
                 'course_code' => 'MOB401',
-                'instructor_ids' => json_encode([count($teacherIds) > 1 ? $teacherIds[1] : $teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[1 % $teacherCount]]),
                 'category' => 'Mobile Development',
                 'credits' => 4,
                 'duration_weeks' => 16,
@@ -121,7 +90,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Data Structures and Algorithms',
                 'description' => 'Master essential data structures and algorithms. Topics include arrays, linked lists, trees, graphs, sorting, and searching algorithms with complexity analysis.',
                 'course_code' => 'CS202',
-                'instructor_ids' => json_encode([count($teacherIds) > 2 ? $teacherIds[2] : $teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[0 % $teacherCount]]),
                 'category' => 'Computer Science',
                 'credits' => 4,
                 'duration_weeks' => 16,
@@ -136,7 +105,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Cybersecurity Fundamentals',
                 'description' => 'Introduction to cybersecurity concepts, threat analysis, risk management, and security best practices. Learn to protect systems and data from cyber threats.',
                 'course_code' => 'SEC501',
-                'instructor_ids' => json_encode([count($teacherIds) > 2 ? $teacherIds[2] : $teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[1 % $teacherCount]]),
                 'category' => 'Cybersecurity',
                 'credits' => 3,
                 'duration_weeks' => 14,
@@ -151,7 +120,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Machine Learning Basics',
                 'description' => 'Introduction to machine learning concepts, supervised and unsupervised learning, neural networks, and practical applications using Python.',
                 'course_code' => 'ML601',
-                'instructor_ids' => json_encode([count($teacherIds) > 2 ? $teacherIds[2] : $teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[0 % $teacherCount]]),
                 'category' => 'Artificial Intelligence',
                 'credits' => 4,
                 'duration_weeks' => 16,
@@ -166,7 +135,7 @@ class CourseSeeder extends Seeder
                 'title' => 'Project Management for IT',
                 'description' => 'Learn project management methodologies, Agile and Scrum frameworks, risk management, and team leadership skills for technology projects.',
                 'course_code' => 'PM701',
-                'instructor_ids' => json_encode([$teacherIds[0]]),
+                'instructor_ids' => json_encode([$teacherIds[1 % $teacherCount]]),
                 'category' => 'Project Management',
                 'credits' => 3,
                 'duration_weeks' => 12,

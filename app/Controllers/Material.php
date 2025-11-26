@@ -22,6 +22,34 @@ class Material extends BaseController
         
         helper(['filesystem', 'form']);
     }
+    
+    /**
+     * Create notification for user
+     * 
+     * @param int $userId User ID to receive notification
+     * @param string $message Notification message
+     * @return bool Success status
+     */
+    private function createNotification($userId, $message)
+    {
+        try {
+            $notificationModel = new \App\Models\NotificationsModel();
+            $philippineTimezone = new \DateTimeZone('Asia/Manila');
+            $currentDateTime = new \DateTime('now', $philippineTimezone);
+            
+            $notificationData = [
+                'user_id' => $userId,
+                'message' => $message,
+                'is_read' => 0,
+                'created_at' => $currentDateTime->format('Y-m-d H:i:s')
+            ];
+            
+            return $notificationModel->insert($notificationData);
+        } catch (\Exception $e) {
+            log_message('error', 'Notification creation error: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function upload($course_id)
     {
@@ -94,6 +122,21 @@ class Material extends BaseController
                         
                         $materialId = $this->materialModel->insertMaterial($materialData);
                           if ($materialId) {
+                            // Step 7: Notify all enrolled students about new material
+                            $db = \Config\Database::connect();
+                            $enrolledStudents = $db->table('enrollments')
+                                ->select('user_id')
+                                ->where('course_id', $course_id)
+                                ->get()
+                                ->getResultArray();
+                            
+                            foreach ($enrolledStudents as $student) {
+                                $this->createNotification(
+                                    $student['user_id'],
+                                    "New material '{$originalName}' has been uploaded to '{$course['title']}'"
+                                );
+                            }
+                            
                             $this->session->setFlashdata('success', 'Material "' . $originalName . '" uploaded successfully!');
                             
                             if ($userRole === 'admin') {

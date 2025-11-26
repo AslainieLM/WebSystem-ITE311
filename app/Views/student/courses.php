@@ -237,6 +237,27 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <!-- Client-side Search Input -->
+                    <?php if (!empty($availableCourses)): ?>
+                        <div class="mb-4">
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" 
+                                       id="searchInput" 
+                                       class="form-control border-start-0" 
+                                       placeholder="Search courses by name or description...">
+                                <span class="input-group-text bg-white border-start-0 text-muted">
+                                    <small>AJAX</small>
+                                </span>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> Search results are fetched from the server in real-time
+                            </small>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (empty($availableCourses)): ?>
                         <div class="text-center py-5">
                             <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
@@ -244,13 +265,13 @@
                             <p class="text-muted">You are enrolled in all available courses or there are no active courses at the moment.</p>
                         </div>
                     <?php else: ?>
-                        <div class="row">
+                        <div class="row" id="coursesContainer">
                             <?php foreach ($availableCourses as $course): ?>
-                                <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="col-md-6 col-lg-4 mb-4 course-card">
                                     <div class="card h-100 border-primary">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <h5 class="card-title text-primary fw-bold">
+                                                <h5 class="card-title text-primary fw-bold course-name">
                                                     <?= esc($course['title']) ?>
                                                 </h5>
                                                 <span class="badge bg-success">Active</span>
@@ -268,7 +289,7 @@
                                             </p>
 
                                             <?php if (!empty($course['description'])): ?>
-                                                <p class="card-text mb-3">
+                                                <p class="card-text mb-3 course-description">
                                                     <?= esc(substr($course['description'], 0, 100)) ?>
                                                     <?= strlen($course['description']) > 100 ? '...' : '' ?>
                                                 </p>
@@ -441,6 +462,145 @@ function enrollCourse(courseId, courseTitle) {
         btn.innerHTML = originalContent;
     });
 }
+
+// Server-side AJAX Search with jQuery
+$(document).ready(function() {
+    let searchTimeout;
+    
+    $('#searchInput').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        
+        const searchTerm = $(this).val().trim();
+        
+        // Add debouncing - wait 500ms after user stops typing
+        searchTimeout = setTimeout(function() {
+            // Show loading state
+            $('#coursesContainer').html(`
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Searching...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Searching courses...</p>
+                </div>
+            `);
+            
+            // Make AJAX request to server
+            $.ajax({
+                url: '<?= base_url('course/search') ?>',
+                method: 'GET',
+                data: { 
+                    search_term: searchTerm 
+                },
+                dataType: 'json',
+                success: function(response) {
+                    displaySearchResults(response.courses);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Search error:', error);
+                    $('#coursesContainer').html(`
+                        <div class="col-12">
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i> 
+                                Error searching courses. Please try again.
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+        }, 500); // 500ms delay for debouncing
+    });
+    
+    function displaySearchResults(courses) {
+        if (courses.length === 0) {
+            $('#coursesContainer').html(`
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="text-muted mt-3">No courses found</h5>
+                    <p class="text-muted">Try adjusting your search terms.</p>
+                </div>
+            `);
+            return;
+        }
+        
+        let html = '';
+        courses.forEach(function(course) {
+            // Skip already enrolled courses (check if they exist in enrolled section)
+            const isEnrolled = <?= json_encode(array_column($enrolledCourses, 'course_id')) ?>.includes(course.id);
+            if (isEnrolled) {
+                return; // Skip this iteration
+            }
+            
+            html += `
+                <div class="col-md-6 col-lg-4 mb-4 course-card">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title text-primary fw-bold course-name">
+                                    ${escapeHtml(course.title)}
+                                </h5>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                            
+                            <p class="card-text text-muted mb-3">
+                                <small>
+                                    <strong>Code:</strong> ${escapeHtml(course.course_code)}<br>
+                                    ${course.category ? '<strong>Category:</strong> ' + escapeHtml(course.category) + '<br>' : ''}
+                                    <strong>Credits:</strong> ${course.credits} | 
+                                    <strong>Duration:</strong> ${course.duration_weeks} weeks
+                                </small>
+                            </p>
+
+                            ${course.description ? `
+                                <p class="card-text mb-3 course-description">
+                                    ${escapeHtml(course.description.substring(0, 100))}${course.description.length > 100 ? '...' : ''}
+                                </p>
+                            ` : ''}
+
+                            ${course.start_date ? `
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-check"></i> ${formatDate(course.start_date)}
+                                        ${course.end_date ? ' - ' + formatDate(course.end_date) : ''}
+                                    </small>
+                                </div>
+                            ` : ''}
+
+                            <button type="button" 
+                                    class="btn btn-success w-100 enroll-btn"
+                                    data-course-id="${course.id}"
+                                    data-course-title="${escapeHtml(course.title)}"
+                                    onclick="enrollCourse(${course.id}, '${escapeHtml(course.title).replace(/'/g, "\\'")}')">
+                                <i class="bi bi-plus-circle-fill"></i> Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        $('#coursesContainer').html(html);
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+    
+    // Helper function to format dates
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+});
 
 // jQuery for Material View Modal
 $(document).ready(function() {
